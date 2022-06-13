@@ -34,7 +34,7 @@ class Session
     DateTime currentDate = DateTime.now();
     int difference = currentDate.difference(oldDate!).inSeconds;
     Utils.printWarning("difference inSeconds: $difference");
-    if(difference > 10)
+    if(difference > 5)
     {
       String validationData = await Navigator.push(context, MaterialPageRoute(builder: (context) => const LockScreen()));
       key = hash(validationData);

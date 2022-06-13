@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:security/controller/navigation_service.dart';
 
+import 'config.dart';
+import 'controller/app.dart';
+import 'controller/file_manager.dart';
 import 'controller/state_controller.dart';
 
 void main() {
-  StateController();
-  runApp(const SecurityApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FileManager file = FileManager();
+  file.generateStructure();
+  ///Initializing App
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<App>(create:(_) => App()
+      )
+    ],
+    child: const SecurityApp(),
+  ));
 }
 
 class SecurityApp extends StatefulWidget {
@@ -16,7 +30,7 @@ class SecurityApp extends StatefulWidget {
 }
 
 class _SecurityAppState extends State<SecurityApp> with WidgetsBindingObserver {
-  // StateController stateController = StateController();
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     StateController.updateState(state);
@@ -31,8 +45,9 @@ class _SecurityAppState extends State<SecurityApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Dashboard(),
       navigatorKey: NavigationService.globalContext,
+      initialRoute: Config.initRoute,
+      routes: Config.routes,
     );
   }
 
@@ -40,103 +55,6 @@ class _SecurityAppState extends State<SecurityApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
-  }
-
-}
-
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
-
-  @override
-  State<Dashboard> createState() => _DashboardState();
-}
-
-class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin{
-
-  TextStyle boldStyle = const TextStyle(
-    fontWeight: FontWeight.bold
-  );
-  
-  List<AppLifecycleState> previousStates = [];
-
-  @override
-  void initState() {
-    super.initState();
-    StateController.appLifeCycle.listen((changedState) {
-      setState(() {
-        previousStates.add(changedState);
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dashboard"),
-      ),
-      body: Column(
-        // crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            // flex: 8,
-            child: Center(
-              child: StreamBuilder<AppLifecycleState>(
-                stream: StateController.appLifeCycle,
-                builder: (context, snapshot) {
-                  if(snapshot.data != null) {
-                    AppLifecycleState changedState = snapshot.data!;
-                    if(changedState == AppLifecycleState.resumed) {
-                      return Text("Received last State \"$changedState\"");
-                    }
-                  }
-                  return Text(
-                    "Welcome, please minimize the app!",
-                    style: boldStyle,
-                  );
-                }
-              )
-            ),
-          ),
-          Expanded(
-            flex: 8,
-            child: ListView.builder(
-              itemCount: previousStates.length,
-              itemBuilder: (BuildContext context, int index)
-              {
-                return ListTile(
-                  leading: Text("#$index", style: boldStyle,),
-                  title: Text("${previousStates.reversed.toList()[index]}"),
-                );
-              }
-            )
-          ),
-          Flexible(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                    onPressed:
-                    previousStates.isNotEmpty
-                        ? (){
-                      setState(() {
-                        previousStates.clear();
-                      });
-                    }
-                        : null,
-                    child: Text("Clear",
-                      style: TextStyle(
-                          color: previousStates.isNotEmpty ? Colors.blue : Colors.grey
-                      ),
-                    )
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

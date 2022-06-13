@@ -41,7 +41,7 @@ class LockScreen extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Wrap(
-                      children: [
+                      children: const [
                         Text("I the Developer Gabriel Vilarinho really \nvalue the security of your data, please authenticate \nyourself to access the app!"),
                       ],
                     ),
