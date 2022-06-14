@@ -12,6 +12,5 @@ class Operation {
   void generateFile()
   {
     String password = "abacaxi";
-
   }
 }

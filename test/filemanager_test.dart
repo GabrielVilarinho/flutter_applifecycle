@@ -9,7 +9,7 @@ class FileManagerTest
   {
     FileManager fileManager = FileManager();
     String folder = 'json';
-    String fileName = 'test.txt';
+    String filename = 'test.txt';
     String content = 'Lorem ipsum';
     group('FileManager', () {
       test('Is the Documents Directory accessible', () async {
@@ -21,13 +21,18 @@ class FileManagerTest
         expect(didGenerateStructure, true);
       });
 
+      test('File doesn\'t exists', () async {
+        bool notExists = await FileManager.fileExists(folder, filename);
+        expect(notExists, false);
+      });
+      
       test('Can Write file', () async {
-        bool canWrite = await FileManager.writeString(folder, fileName, content);
+        bool canWrite = await FileManager.writeString(folder, filename, content);
         expect(canWrite, true);
       });
 
       test('Can Read file', () async {
-        dynamic data = await FileManager.readFile(folder, fileName);
+        Object data = await FileManager.readFile(folder, filename);
         if(data is String)
         {
           expect(data, content);
@@ -39,7 +44,7 @@ class FileManagerTest
       });
 
       test('Can Remove file', () async {
-        bool canRemove = await FileManager.removeFile(folder, fileName);
+        bool canRemove = await FileManager.removeFile(folder, filename);
         expect(canRemove, true);
       });
     });

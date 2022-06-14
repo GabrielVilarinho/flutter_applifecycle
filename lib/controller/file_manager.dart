@@ -11,7 +11,8 @@ enum AppRootFolder {
   images,
 }
 
-class FileManager {
+class FileManager
+{
   static final _self = FileManager._internal();
   Completer<bool> structureOk = Completer();
 
@@ -52,7 +53,6 @@ class FileManager {
     List<String> folders = path.split("/\"");
     List<String> structureFolders = AppRootFolder.values.asNameMap().keys.toList();
     String validatingPath = (await documents()).path;
-
     for(int i = 0; i < folders.length; i++)
     {
       if(folders[i].contains(r'^.*\.[^\\]+$'))
@@ -89,8 +89,18 @@ class FileManager {
     return Directory(validatingPath);
   }
 
-  static Future<bool> writeString(String path, String filename, Object? object, {bool create = true}) async
+  static Future<bool> fileExists(String path, String filename) async
   {
+    Directory documentsFolder = await documents();
+    File file = File("${documentsFolder.path}/$path/$filename");
+    return await file.exists();
+  }
+
+  static Future<bool> writeString(String path, String filename, dynamic object, {bool create = true}) async
+  {
+    // Utils.printWarning("What is this Object?$object");
+    // await Future.delayed(Duration(seconds: 2));
+    // return false;
     String content = "";
     if(object is! String) {
       content = jsonEncode(object);
@@ -99,13 +109,16 @@ class FileManager {
     {
       content = object;
     }
+    // Utils.printMark("Content $content");
     Directory directory = await _self._checkSubfolder(path, create: create);
+    // Utils.printError(directory.absolute.path);
     File res = File("${directory.path}/$filename");
-
-    bool fileExists = await res.exists();
-    if(fileExists) {
+    // Utils.printWarning(res.absolute.path);
+    if(await fileExists(path, filename))
+    {
       Utils.printWarning("Overwriting \"$filename\" file at \"${res.absolute.path}\"");
-    } else
+    }
+    else
     {
       Utils.printWarning("Creating \"$filename\" file at \"${res.absolute.path}\"");
     }
@@ -122,14 +135,15 @@ class FileManager {
     return true;
   }
 
-  static dynamic readFile(String path, String fileName, {asBytes = false}) async
+  static Future<Object> readFile(String path, String filename, {asBytes = false}) async
   {
+    Utils.printWarning("Reading file: \"$path/$filename\"");
     Directory directory = await _self._checkSubfolder(path);
-    File res = File(directory.path + "/$fileName");
-    bool fileExists = await res.exists();
-    if(!fileExists)
+    File res = File(directory.path + "/$filename");
+    if(!(await fileExists(path, filename)))
     {
-      throw "Error at FileManager: File \"$fileName\" doesn't exists.";
+      // throw "Error at FileManager: File \"$fileName\" doesn't exists.";
+      return false;
     }
     Uint8List bytes = res.readAsBytesSync();
     if(asBytes)
@@ -141,14 +155,13 @@ class FileManager {
     return data;
   }
 
-  static Future<bool> removeFile(String path, String fileName, {recursive = false}) async
+  static Future<bool> removeFile(String path, String filename, {recursive = false}) async
   {
     Directory directory = await _self._checkSubfolder(path);
-    File res = File(directory.path + "/$fileName");
-    bool fileExists = await res.exists();
-    if(!fileExists)
+    File res = File(directory.path + "/$filename");
+    if(!(await fileExists(path, filename)))
     {
-      throw "Error at FileManager: File \"$fileName\" doesn't exists.";
+      throw "Error at FileManager: File \"$filename\" doesn't exists.";
     }
     res.delete(recursive: recursive);
     return true;

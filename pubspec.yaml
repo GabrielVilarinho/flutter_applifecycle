@@ -39,6 +39,10 @@ dependencies:
   flutter_locker: 2.0.3
   provider: ^6.0.3
   path_provider: ^2.0.11
+  bip39: ^1.0.6
+  bip32: ^2.0.0
+  aes_crypt: ^0.1.1
+  web3dart: ^2.3.5
 
 dev_dependencies:
   flutter_test:

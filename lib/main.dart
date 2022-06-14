@@ -7,6 +7,7 @@ import 'controller/app.dart';
 import 'controller/file_manager.dart';
 import 'controller/state_controller.dart';
 
+///It is what it is
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
