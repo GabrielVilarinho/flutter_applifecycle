@@ -41,8 +41,9 @@ dependencies:
   path_provider: ^2.0.11
   bip39: ^1.0.6
   bip32: ^2.0.0
-  aes_crypt: ^0.1.1
   web3dart: ^2.3.5
+  aes_crypt_null_safe: ^2.0.2
+  http: ^0.13.4
 
 dev_dependencies:
   flutter_test:

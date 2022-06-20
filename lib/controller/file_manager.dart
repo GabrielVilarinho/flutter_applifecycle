@@ -4,12 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:security/lib/utils.dart';
-
-enum AppRootFolder {
-  json,
-  managed,
-  images,
-}
+import 'package:security/lib/types.dart';
 
 class FileManager
 {
@@ -36,6 +31,7 @@ class FileManager
       }
       folder.createSync(recursive: true);
     }
+    structureOk = Completer();
     structureOk.complete(true);
   }
 

@@ -10,20 +10,19 @@ class AccountTest
   {
     Account();
     List? initAccounts;
+    Map entry = {
+      "slot" : 0,
+      "title" : "Example Account",
+      "derived": 0,
+      "data": "",
+    };
+
     group("Accounts", () {
       test("Initialization", () async {
         initAccounts = await Account.accounts.future;
         expect(initAccounts!.length, greaterThanOrEqualTo(0));
-        Utils.printMark("Folder name: ${Account.folder}");
-        Utils.printMark("File name: ${Account.filename}");
       });
       test("Insert a new Account to accounts", () async {
-        Map entry = {
-          "slot" : 0,
-          "title" : "Example Account",
-          "derived": 0,
-          "data": "",
-        };
         bool didInsetAnAccount = await Account.add(entry);
         expect(didInsetAnAccount, true);
       });
@@ -31,6 +30,10 @@ class AccountTest
         await Future.delayed(const Duration(milliseconds: 500));
         List _lastList = await Account.accounts.future;
         expect(_lastList.length, equals(initAccounts!.length));
+      });
+      test("Remove added account", () async {
+        bool didRemoveAnAccount = await Account.remove(entry);
+        expect(didRemoveAnAccount, true);
       });
     });
   }

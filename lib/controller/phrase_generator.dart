@@ -1,10 +1,6 @@
 import 'package:bip39/bip39.dart';
-
-enum Strenght
-{
-  twelve,
-  twentyFour,
-}
+import 'package:security/lib/types.dart';
+import 'package:security/lib/wordlist.dart';
 
 class PhraseGenerator
 {
@@ -17,5 +13,24 @@ class PhraseGenerator
       case Strenght.twentyFour:
         return generateMnemonic(strength: 256);
     }
+  }
+
+  static bool isValid(String wordString)
+  {
+    List<String> words = wordString.split(' ');
+
+    if(![12,24].contains(words.length))
+    {
+      throw "Error at PhraseGenerator.isValid: Invalid mnemonic length";
+    }
+
+    for(String word in words)
+    {
+      if(!WORDLIST.contains(word.toLowerCase()))
+      {
+        throw "Error at PhraseGenerator.isValid: Unknown word found in mnemonic \"$word\"";
+      }
+    }
+    return true;
   }
 }

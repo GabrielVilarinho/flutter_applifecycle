@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:security/controller/file_manager.dart';
 import 'package:security/lib/utils.dart';
+import 'package:security/lib/types.dart';
 
 class Account
 {
@@ -52,8 +53,7 @@ class Account
 
     if(!didSave) {
       // throw "Error at Account.add: Could not save the account's data";
-      Utils.printError("Error at Account.add: Could not save the account's data");
-      return false;
+      throw "Error at Account.add: Could not save the account's data";
     }
     accounts = Completer()
       ..complete(account);
@@ -82,5 +82,30 @@ class Account
     }
     // Utils.printError("Score: $score, Total: ${keys.length}");
     return false;
+  }
+
+  static Future<bool> remove(Map entry) async
+  {
+    bool isValid = validator(entry);
+    if(!isValid)
+    {
+      throw "Error at Account.remove: Invalid keys";
+    }
+
+    List account = await accounts.future;
+
+    bool didRemove = account.remove(entry);
+    if(!didRemove) {
+      throw "Error at Account.remove: Could not find account";
+    }
+
+    bool didSave = await FileManager.writeString(folder, filename, jsonEncode(account));
+
+    if(!didSave) {
+      throw "Error at Account.remove: Could not save the account's data";
+    }
+    accounts = Completer()
+      ..complete(account);
+    return true;
   }
 }
