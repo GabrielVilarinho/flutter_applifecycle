@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:security/controller/account.dart';
 import 'package:security/lib/utils.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:web3dart/web3dart.dart';
+
 class Network {
   static final Network _self = Network._internal();
   Network._internal();
@@ -80,6 +82,72 @@ class Network {
 
     String response = await get([body]);
     return jsonDecode(response);
+  }
+
+  ///The id of the platform issuing tokens (See asset_platforms endpoint for list of options)
+  ///asset_platforms: https://api.coingecko.com/api/v3/asset_platforms
+  static Future<double> getPrice({String currency = "usd", String id = "avalanche-2"}) async
+  {
+    String api = "https://api.coingecko.com/api/v3/simple/price?ids=$id&vs_currencies=$currency";
+    String response = await get(null, url: api, method: "GET");
+
+    dynamic value = (jsonDecode(response) as Map)[id][currency];
+    if(value is double) {
+      return value;
+    }
+    if(value is String) {
+      return double.parse(value);
+    }
+    return 0.0;
+  }
+
+  ///The id of the platform issuing tokens (See asset_platforms endpoint for list of options)
+  ///asset_platforms: https://api.coingecko.com/api/v3/asset_platforms
+  static Future<List<Map>> getPlatformHistory({String currency = "usd", String id = "avalanche-2", int days = 30}) async
+  {
+    List<Map> ret = [];
+    String api = "https://api.coingecko.com/api/v3/coins/$id/market_chart?vs_currency=$currency&days=$days";
+    String response = await get(null, url: api, method: "GET");
+    List date = (jsonDecode(response) as Map)["prices"];
+    intl.DateFormat dateFormat = intl.DateFormat('dd/MM/yyyy hh:mm:ss a');
+    for(List day in date)
+    {
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(day.first);
+      ret.add({
+        "date" : dateFormat.format(dateTime),
+        currency : (day.last as double).toStringAsFixed(2),
+        "exact" : day.last
+      });
+    }
+    return ret;
+  }
+
+  ///The id of the platform issuing tokens (See asset_platforms endpoint for list of options)
+  ///asset_platforms: https://api.coingecko.com/api/v3/asset_platforms
+  static Future<List<Map>> getTokenHistory(
+    String address,
+    {
+      String currency = "usd",
+      String id = "avalanche",
+      int days = 30
+    }) async
+  {
+    try {EthereumAddress.fromHex(address);} catch (e) {Utils.printWarning(e.toString());}
+    List<Map> ret = [];
+    String api = "https://api.coingecko.com/api/v3/coins/$id/contract/$address/market_chart/?vs_currency=$currency&days=$days";
+    String response = await get(null, url: api, method: "GET");
+    List date = (jsonDecode(response) as Map)["prices"];
+    intl.DateFormat dateFormat = intl.DateFormat('dd/MM/yyyy hh:mm:ss a');
+    for(List day in date)
+    {
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(day.first);
+      ret.add({
+        "date" : dateFormat.format(dateTime),
+        currency : (day.last as double).toStringAsFixed(2),
+        "exact" : day.last
+      });
+    }
+    return ret;
   }
 
   static Future<String> get(body, {String? url, Map<String, String>? headers, String method = "POST"}) async

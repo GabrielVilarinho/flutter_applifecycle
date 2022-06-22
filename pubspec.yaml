@@ -44,6 +44,8 @@ dependencies:
   web3dart: ^2.3.5
   aes_crypt_null_safe: ^2.0.2
   http: ^0.13.4
+  decimal: ^2.2.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
