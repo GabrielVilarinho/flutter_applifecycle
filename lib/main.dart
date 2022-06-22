@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:security/controller/navigation_service.dart';
 
 import 'config.dart';
-import 'controller/app.dart';
+import 'controller/app_test.dart';
 import 'controller/file_manager.dart';
 import 'controller/state_controller.dart';
 

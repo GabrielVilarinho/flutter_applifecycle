@@ -84,7 +84,7 @@ class Authentication
       "data": jsonDecode(wallet.toJson())
     };
 
-    bool didAddAccount = await Account.add(entry);
+    bool didAddAccount = await Account.add(entry, wallet);
 
     if(didAddAccount)
     {
@@ -146,7 +146,7 @@ class Authentication
       "data": jsonDecode(wallet.toJson())
     };
 
-    bool didAddAccount = await Account.add(entry);
+    bool didAddAccount = await Account.add(entry, wallet);
 
     return didAddAccount;
   }

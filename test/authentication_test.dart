@@ -7,6 +7,7 @@ import 'package:security/controller/autentication.dart';
 import 'package:security/controller/file_manager.dart';
 import 'package:security/lib/types.dart';
 import 'package:security/lib/utils.dart';
+import 'package:web3dart/web3dart.dart';
 
 class AuthenticationTest {
   static void main()
@@ -22,13 +23,21 @@ class AuthenticationTest {
       test("Initialization Completer", () async {
         bool? init = await Authentication.init.future;
         expect(init, isNotNull);
-        Utils.printMark("Authentication.accountExists: ${Authentication.walletExists}");
+        // Utils.printMark("Authentication.accountExists: ${Authentication.walletExists}");
       });
 
       test("Creating Wallet if not exists", () async {
         Utils.printWarning("[Password] \"$password\"");
         await Authentication.createWallet(password, Strenght.twelve);
         expect(Authentication.walletExists, true);
+      });
+
+      test("Display the account public key", () async {
+        List<AccountData> accounts = await Account.accounts!.future;
+        // EthereumAddress address = await accounts.first.address;
+        EthereumAddress address = accounts.first.address!;
+        Utils.printApprove("First account's address: \"${address.hex}\"");
+        expect(accounts.length, greaterThan(0));
       });
 
       test("Unlocking file with password", () async {
@@ -38,6 +47,13 @@ class AuthenticationTest {
 
       test("Deriving account from master mnemonic", () async {
         bool didDerive = await Authentication.deriveAccount(password, 1);
+        List<AccountData> accounts = await Account.accounts!.future;
+        for(int i = 0; i < accounts.length; i++)
+        {
+          // EthereumAddress address = await accounts[i].address;
+          EthereumAddress address = accounts[i].address!;
+          Utils.printApprove("Master | ID #$i Account Address: \"${address.hex}\"");
+        }
         expect(didDerive, true);
       });
 
@@ -48,6 +64,10 @@ class AuthenticationTest {
           title: "Imported from Testing",
           mnemonic: "hat salt toy seed check wise link execute pattern senior eyebrow melody"
         );
+        List<AccountData> accounts = await Account.accounts!.future;
+        // EthereumAddress address = await accounts.last.address;
+        EthereumAddress address = accounts.last.address!;
+        Utils.printApprove("Imported | ID #${accounts.length - 1} Account Address ${address.hex}");
         expect(didDerive, true);
       });
     });
